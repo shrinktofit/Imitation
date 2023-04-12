@@ -1,0 +1,154 @@
+{
+  "ver": "2.3.4",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "b7f1f1c7-0004-4a61-995b-94424cfcf961",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "bdca4": {
+      "importer": "gltf-mesh",
+      "uuid": "b7f1f1c7-0004-4a61-995b-94424cfcf961@bdca4",
+      "displayName": "",
+      "id": "bdca4",
+      "name": "Blockman_Material0.mesh",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.1.0",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "18d6f": {
+      "importer": "gltf-animation",
+      "uuid": "b7f1f1c7-0004-4a61-995b-94424cfcf961@18d6f",
+      "displayName": "",
+      "id": "18d6f",
+      "name": "mixamo.com.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.03333333507180214
+        },
+        "events": []
+      },
+      "ver": "1.0.16",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "438fe": {
+      "importer": "gltf-skeleton",
+      "uuid": "b7f1f1c7-0004-4a61-995b-94424cfcf961@438fe",
+      "displayName": "",
+      "id": "438fe",
+      "name": "UnnamedSkeleton.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 22
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "698de": {
+      "importer": "gltf-material",
+      "uuid": "b7f1f1c7-0004-4a61-995b-94424cfcf961@698de",
+      "displayName": "",
+      "id": "698de",
+      "name": "m_body.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "bab0f": {
+      "importer": "gltf-material",
+      "uuid": "b7f1f1c7-0004-4a61-995b-94424cfcf961@bab0f",
+      "displayName": "",
+      "id": "bab0f",
+      "name": "m_face.material",
+      "userData": {
+        "gltfIndex": 1
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0e639": {
+      "importer": "gltf-scene",
+      "uuid": "b7f1f1c7-0004-4a61-995b-94424cfcf961@0e639",
+      "displayName": "",
+      "id": "0e639",
+      "name": "ULPAC.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.12",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "mixamo.com",
+        "duration": 0.03333333507180214,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "mixamo.com",
+            "from": 0,
+            "to": 0.03333333507180214,
+            "wrapMode": 2
+          }
+        ]
+      }
+    ],
+    "redirect": "b7f1f1c7-0004-4a61-995b-94424cfcf961@0e639",
+    "assetFinder": {
+      "meshes": [
+        "b7f1f1c7-0004-4a61-995b-94424cfcf961@bdca4"
+      ],
+      "skeletons": [
+        "b7f1f1c7-0004-4a61-995b-94424cfcf961@438fe"
+      ],
+      "textures": [],
+      "materials": [
+        "b7f1f1c7-0004-4a61-995b-94424cfcf961@698de",
+        "b7f1f1c7-0004-4a61-995b-94424cfcf961@bab0f"
+      ],
+      "scenes": [
+        "b7f1f1c7-0004-4a61-995b-94424cfcf961@0e639"
+      ]
+    }
+  }
+}
