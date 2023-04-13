@@ -1,0 +1,17 @@
+{
+    "targetRoot": "mixamorig:Hips",
+    "mappings": [
+        { "source": "pelvis", "target": "mixamorig:Hips" },
+
+        { "source": "thigh_l", "target": "mixamorig:LeftUpLeg" },
+        { "source": "calf_l", "target": "mixamorig:LeftLeg" },
+        { "source": "foot_l", "target": "mixamorig:LeftFoot" },
+
+        { "source": "thigh_r", "target": "mixamorig:RightUpLeg" },
+        { "source": "calf_r", "target": "mixamorig:RightLeg" },
+        { "source": "foot_r", "target": "mixamorig:RightFoot" }
+    ],
+    "includes": [
+        "foot_l"
+    ]
+}
