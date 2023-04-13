@@ -1,6 +1,7 @@
 import { _decorator, animation, CCClass, Component, Node, instantiate, warn, Vec3, Quat, error, Skeleton, Mat4, log, approx } from 'cc';
 import { DEBUG } from 'cc/env';
 import { ImitationDefinition, ImitationDefinitionJson } from './ImitationDefinition';
+import { fromSRT, toSRT } from './Utility/Mat4Polyfill';
 const { ccclass, property } = _decorator;
 
 const animationGraphRuntimeConstructor =
@@ -82,43 +83,23 @@ export class ImitatedAnimationController extends Component {
         this.node.addChild(debuggingSource);
         this._debuggingSource = debuggingSource;
 
-        for (const targetNode of visit(targetRoot)) {
-            const targetNodeName = targetNode.name;
-            let mapping = json.mappings.find((mapping) => mapping.target === targetNodeName);
-            if (mapping && json.includes && json.includes.indexOf(mapping.source) < 0) {
-                mapping = undefined;
-            }
-            const managedBone = this._addManagedBone(
-                targetNode,
-                this.targetSkeleton,
-                mapping,
-                imitationSourceNode,
-                this.sourceSkeleton,
-                false,
-            );
-            if (managedBone) {
-                this._managedTargetBones.push(managedBone);
-            }
-        }
+        this._managedTargetRootBone = this._addManagedBone(
+            targetRoot,
+            this.targetSkeleton,
+            json,
+            imitationSourceNode,
+            this.sourceSkeleton,
+            false,
+        );
 
-        for (const debuggingSourceNode of visit(debuggingSource)) {
-            const targetNodeName = debuggingSourceNode.name;
-            let mapping = json.mappings.find((mapping) => mapping.source === targetNodeName);
-            if (mapping && json.includes && json.includes.indexOf(mapping.source) < 0) {
-                mapping = undefined;
-            }
-            const managedBone = this._addManagedBone(
-                debuggingSourceNode,
-                this.sourceSkeleton,
-                mapping,
-                imitationSourceNode,
-                this.sourceSkeleton,
-                true,
-            );
-            if (managedBone) {
-                this._managedDebuggingSourceBones.push(managedBone);
-            }
-        }
+        this._managedDebuggingSourceRootBone = this._addManagedBone(
+            debuggingSource.getChildByName('root')!,
+            this.sourceSkeleton,
+            json,
+            imitationSourceNode,
+            this.sourceSkeleton,
+            true,
+        );
     }
 
     public getValue(...args: Parameters<animation.AnimationController['getValue']>) {
@@ -137,17 +118,15 @@ export class ImitatedAnimationController extends Component {
             return undefined;
         }
 
-        for (const bone of this._managedTargetBones) {
-            bone.imitate(sourceOriginNode, this.node, false);
+        if (this._managedTargetRootBone) {
+            this._managedTargetRootBone.imitate(sourceOriginNode, false);
         }
 
-        if (this._debuggingSource) {
-            for (const bone of this._managedDebuggingSourceBones) {
-                bone.imitate(sourceOriginNode, this._debuggingSource, true);
-            }
+        if (this._managedDebuggingSourceRootBone) {
+            this._managedDebuggingSourceRootBone.imitate(sourceOriginNode, true);
         }
 
-        for (const targetRootNode of [this.node.getChildByName('mixamorig:Hips')]) {
+        for (const targetRootNode of [this.node.getChildByName('mixamorig:Hips')!]) {
             if (!approx(this.targetPostScale, 1, 1e-5)) {
                 targetRootNode.scale = Vec3.multiplyScalar(new Vec3(), targetRootNode.scale, this.targetPostScale);
                 targetRootNode.position = Vec3.multiplyScalar(new Vec3(), targetRootNode.position, this.targetPostScale);
@@ -160,12 +139,12 @@ export class ImitatedAnimationController extends Component {
         }
 
         if (true) {
-            if (this._managedTargetBones.length !== 0) {
-                this._managedTargetBones[0].target.node.rotate(this._sourceOriginNode!.getChildByName('root')?.rotation);
+            if (this._managedTargetRootBone) {
+                this._managedTargetRootBone.target.node.rotate(this._sourceOriginNode!.getChildByName('root')!.rotation);
             }
     
-            if (this._managedDebuggingSourceBones.length !== 0) {
-                this._managedDebuggingSourceBones[0].target.node.rotate(this._sourceOriginNode!.getChildByName('root')?.rotation);
+            if (this._managedDebuggingSourceRootBone) {
+                this._managedDebuggingSourceRootBone.target.node.rotate(this._sourceOriginNode!.getChildByName('root')!.rotation);
             }
         }
     }
@@ -174,16 +153,16 @@ export class ImitatedAnimationController extends Component {
 
     private _sourceOriginNode: Node | undefined = undefined;
 
-    private _managedTargetBones: ManagedBone[] = [];
+    private _managedTargetRootBone: ManagedBone | undefined;
 
-    private _managedDebuggingSourceBones: ManagedBone[] = [];
+    private _managedDebuggingSourceRootBone: ManagedBone | undefined;
 
     private _debuggingSource: Node | undefined = undefined;
 
     private _addManagedBone(
         targetBone: Node,
         targetSkeleton: Skeleton,
-        mapping: Omit<ImitationDefinitionJson['mappings'][0], 'target'> | undefined,
+        definition: ImitationDefinitionJson,
         sourceOrigin: Node,
         sourceSkeleton: Skeleton,
         isDebuggingSource: boolean,
@@ -211,6 +190,16 @@ export class ImitatedAnimationController extends Component {
             ),
         );
 
+        let mapping = definition.mappings.find((mapping) => {
+            if (isDebuggingSource) {
+                return mapping.source === targetBone.name;
+            } else {
+                return mapping.target === targetBone.name;
+            }
+        });
+        if (mapping && definition.includes && definition.includes.indexOf(mapping.source) < 0) {
+            mapping = undefined;
+        }
         if (mapping) {
             const sourceNode = findNodeByName(sourceOrigin, mapping.source);
             if (!sourceNode) {
@@ -232,6 +221,20 @@ export class ImitatedAnimationController extends Component {
             }
         }
 
+        for (const child of targetBone.children) {
+            const childBone = this._addManagedBone(
+                child,
+                targetSkeleton,
+                definition,
+                sourceOrigin,
+                sourceSkeleton,
+                isDebuggingSource,
+            );
+            if (childBone) {
+                managedBone.addChild(childBone);
+            }
+        }
+
         return managedBone;
     }
 }
@@ -242,20 +245,59 @@ class ManagedBone {
     ) {
 
     }
+
+    private parent: ManagedBone | undefined;
     
     public mapping: {
         source: BoneInstance;
     } | undefined;
 
-    public imitate(sourceOrigin: Node, targetOrigin: Node, isDebuggingSource: boolean) {
-        const { target, mapping } = this;
-        const {
-            node: targetNode,
-        } = target;
+    private children: ManagedBone[] = [];
 
-        targetNode.position = target.referencePoseLocalTransform.position;
-        targetNode.rotation = target.referencePoseLocalTransform.rotation;
-        targetNode.scale = target.referencePoseLocalTransform.scale;
+    public addChild(child: ManagedBone) {
+        this.children.push(child);
+        child.parent = this;
+    }
+
+    public readonly targetBoneSkeletonSpaceTransform = new Transform();
+
+    public imitate(sourceOrigin: Node, isDebuggingSource: boolean) {
+        this.imitateRecurse(sourceOrigin, isDebuggingSource);
+
+        this.solveLocalPoseRecurse();
+    }
+
+    private resetToBindPose() {
+        Transform.copy(this.targetBoneSkeletonSpaceTransform, this.target.referencePoseLocalTransform);
+        if (this.parent) {
+            Transform.multiply(this.targetBoneSkeletonSpaceTransform, this.parent.targetBoneSkeletonSpaceTransform, this.targetBoneSkeletonSpaceTransform);
+        }
+    }
+
+    private solveLocalPoseRecurse() {
+        for (const child of this.children) {
+            child.solveLocalPoseRecurse();
+        }
+
+        if (this.parent) {
+            calcLocal(this.targetBoneSkeletonSpaceTransform, this.targetBoneSkeletonSpaceTransform, this.parent.targetBoneSkeletonSpaceTransform);
+        }
+
+        this.target.node.position = this.targetBoneSkeletonSpaceTransform.position;
+        this.target.node.rotation = this.targetBoneSkeletonSpaceTransform.rotation;
+        this.target.node.scale = this.targetBoneSkeletonSpaceTransform.scale;
+    }
+
+    private imitateRecurse(sourceOrigin: Node, isDebuggingSource: boolean) {
+        this.resetToBindPose();
+        this.imitateSelf(sourceOrigin, isDebuggingSource);
+        for (const child of this.children) {
+            child.imitateRecurse(sourceOrigin, isDebuggingSource);
+        }
+    }
+
+    private imitateSelf(sourceOrigin: Node, isDebuggingSource: boolean) {
+        const { mapping } = this;
 
         if (!mapping) {
             return;
@@ -264,7 +306,7 @@ class ManagedBone {
         const {
             referencePoseTransform: targetReferenceTransform,
             referencePoseLocalTransform: targetReferenceLocalTransform,
-        } = target;
+        } = this.target;
 
         const {
             node: sourceNode,
@@ -275,21 +317,21 @@ class ManagedBone {
         const sourceNodeSkeletonSpaceTransform = Object.freeze(accumulateLocalTransformsUtil(sourceNode, sourceOrigin));
         // const sourceNodeSkeletonSpaceTransform = sourceReferenceTransform;
 
+        const targetNodeSkeletonSpaceTransform = this.targetBoneSkeletonSpaceTransform;
+
         if (isDebuggingSource) {
+            const sourceNodeSkeletonSpaceTransform = Object.freeze(accumulateLocalTransformsUtil(sourceNode, sourceOrigin.getChildByName('root')!));
+
             const sourceNodeLocalTransform = inverseAccumulateTransforms(
-                new Transform(), sourceNodeSkeletonSpaceTransform, sourceNode, sourceOrigin);
+                new Transform(), sourceNodeSkeletonSpaceTransform, sourceNode, sourceOrigin.getChildByName('root')!);
             if (DEBUG) {
                 if (!Transform.equals(sourceNodeLocalTransform, new Transform(sourceNode.position, sourceNode.rotation, sourceNode.scale))) {
                     debugger;
                 }
             }
-            targetNode.rotation = sourceNodeLocalTransform.rotation;
-            targetNode.position = sourceNodeLocalTransform.position;
-            targetNode.scale = sourceNodeLocalTransform.scale;
+            Transform.copy(targetNodeSkeletonSpaceTransform, sourceNodeSkeletonSpaceTransform);
             return;
         }
-
-        const targetNodeSkeletonSpaceTransform = Transform.copy(new Transform(), targetReferenceTransform);
 
         enum DebugKind { targetRef, sourceRef, sourceAnim };
         const debugKind = DebugKind.sourceAnim as DebugKind;
@@ -303,6 +345,7 @@ class ManagedBone {
         // Handle rotation.
         {
             const targetNodeSkeletonSpaceRotation = targetNodeSkeletonSpaceTransform.rotation;
+            Quat.copy(targetNodeSkeletonSpaceRotation, this.target.referencePoseTransform.rotation);
 
             // // Target joint local space.
             // Quat.identity(targetNodeSkeletonSpaceRotation);
@@ -327,33 +370,35 @@ class ManagedBone {
         }
 
         // Handle position
-        if (debugKind === DebugKind.sourceAnim) {
-            const targetRefPoseLength = targetReferenceTransform.position.length();
-            const sourceRefPoseLength = sourceReferenceTransform.position.length();
+        if (debugKind === DebugKind.sourceAnim || DebugKind.sourceRef) {
+            const targetRefPoseLength = targetReferenceLocalTransform.position.length();
+            const sourceRefPoseLength = sourceReferenceLocalTransform.position.length();
+            const sourceTransform = debugKind === DebugKind.sourceAnim ? sourceNodeSkeletonSpaceTransform : sourceReferenceTransform;
+            const invP = Mat4.invert(new Mat4(), this.targetBoneSkeletonSpaceTransform.toMat(new Mat4()));
+            const sourceTransformPositionLocal = Vec3.transformMat4(new Vec3(), sourceTransform.position, invP);
+            // Vec3.copy(targetNodeSkeletonSpaceTransform.position, sourceTransform.position);
             if (sourceRefPoseLength > 1e-5) {
-                Vec3.multiplyScalar(targetNodeSkeletonSpaceTransform.position, sourceNodeSkeletonSpaceTransform.position, targetRefPoseLength / sourceRefPoseLength);
-            }
-        } else if (debugKind === DebugKind.sourceRef) {
-            const targetRefPoseLength = targetReferenceTransform.position.length();
-            const sourceRefPoseLength = sourceReferenceTransform.position.length();
-            if (sourceRefPoseLength > 1e-5) {
-                Vec3.multiplyScalar(targetNodeSkeletonSpaceTransform.position, sourceReferenceTransform.position, targetRefPoseLength / sourceRefPoseLength);
-            }
-        }
+                const scaling = targetRefPoseLength / sourceRefPoseLength;
 
-        {
-            const targetNodeLocalTransform = inverseAccumulateTransforms(
-                new Transform(), targetNodeSkeletonSpaceTransform, targetNode, targetOrigin);
-            if (debugKind === DebugKind.targetRef) {
-                if (!Transform.equals(targetNodeLocalTransform, targetReferenceLocalTransform)) {
-                    debugger;
-                }
+                const localTransform = this.parent
+                    ? calcLocal(new Transform(), targetNodeSkeletonSpaceTransform, this.parent.targetBoneSkeletonSpaceTransform)
+                    : Transform.copy(new Transform(), targetNodeSkeletonSpaceTransform);
+                Vec3.copy(localTransform.position, sourceTransformPositionLocal);
+                Vec3.multiplyScalar(localTransform.position, localTransform.position, scaling);
+
+                Transform.multiply(targetNodeSkeletonSpaceTransform, this.parent ? this.parent.targetBoneSkeletonSpaceTransform : new Transform(), localTransform);
             }
-            targetNode.rotation = targetNodeLocalTransform.rotation;
-            targetNode.position = targetNodeLocalTransform.position;
-            targetNode.scale = targetNodeLocalTransform.scale;
         }
     }
+}
+
+function calcLocal(out: Transform, childWorld: Transform, parentWorld: Transform) {
+    const invP = parentWorld.toMat(new Mat4());
+    Mat4.invert(invP, invP);
+    const w = childWorld.toMat(new Mat4());
+    Mat4.multiply(w, invP, w);
+    Transform.fromMat(out, w);
+    return out;
 }
 
 class BoneInstance {
@@ -371,7 +416,7 @@ class BoneInstance {
 
 function accumulateLocalTransformsUtil(from: Node, to: Node) {
     const transform = new Transform(Vec3.ZERO, Quat.IDENTITY, Vec3.ONE);
-    for (let node = from; node; node = node.parent) {
+    for (let node: Node | null = from; node; node = node.parent) {
         if (node === to) {
             return transform;
         }
@@ -424,11 +469,11 @@ class Transform {
     }
 
     public toMat(out: Mat4) {
-        return Mat4.fromSRT(out, this.rotation, this.position, this.scale);
+        return fromSRT(out, this.rotation, this.position, this.scale);
     }
 
     public static fromMat(out: Transform, mat: Mat4) {
-        Mat4.toSRT(mat, out.rotation, out.position, out.scale);
+        toSRT(mat, out.rotation, out.position, out.scale);
         return out;
     }
 
@@ -448,6 +493,13 @@ class Transform {
     public rotate(rotation: Readonly<Quat>) {
         Quat.multiply(this.rotation, rotation, this.rotation);
         Vec3.transformQuat(this.position, this.position, rotation);
+    }
+
+    public applyToPosition(out: Vec3, position: Readonly<Vec3>) {
+        Vec3.multiply(out, position, this.scale);
+        Vec3.transformQuat(out, out, this.rotation);
+        Vec3.add(out, out, this.position);
+        return out;
     }
 }
 

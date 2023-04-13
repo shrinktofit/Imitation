@@ -4,7 +4,6 @@
     "_name": "",
     "_objFlags": 0,
     "_native": "",
-    "interruptionBehavior": 0,
     "_layers": [
       {
         "__id__": 1
@@ -19,15 +18,13 @@
     },
     "name": "",
     "weight": 1,
-    "mask": null,
-    "additive": false,
-    "_stashes": {}
+    "mask": null
   },
   {
     "__type__": "cc.animation.StateMachine",
     "__editorExtras__": {
       "name": "",
-      "id": "16812770860030.1467026616624636",
+      "id": "16813922010040.876271136679939",
       "clone": null
     },
     "_states": [
@@ -42,14 +39,11 @@
       },
       {
         "__id__": 6
-      },
-      {
-        "__id__": 22
       }
     ],
     "_transitions": [
       {
-        "__id__": 28
+        "__id__": 8
       }
     ],
     "_entryState": {
@@ -66,7 +60,7 @@
     "__type__": "cc.animation.State",
     "__editorExtras__": {
       "name": "",
-      "id": "16812770860030.7849906121412915",
+      "id": "16813922010040.07309903720754574",
       "clone": null,
       "centerX": -125,
       "centerY": 0
@@ -77,7 +71,7 @@
     "__type__": "cc.animation.State",
     "__editorExtras__": {
       "name": "",
-      "id": "16812770860030.6670066452278376",
+      "id": "16813922010040.9907420944745062",
       "clone": null,
       "centerX": 125,
       "centerY": 0
@@ -88,7 +82,7 @@
     "__type__": "cc.animation.State",
     "__editorExtras__": {
       "name": "",
-      "id": "16812770860030.8748793293742791",
+      "id": "16813922010040.1683026272845498",
       "clone": null,
       "centerX": 125,
       "centerY": 0
@@ -96,224 +90,28 @@
     "name": "Any"
   },
   {
-    "__type__": "cc.animation.PoseState",
-    "__editorExtras__": {
-      "name": "",
-      "id": "16812953695680.4428142703553337",
-      "clone": null,
-      "centerX": 14,
-      "centerY": -38
-    },
-    "name": "Pose",
-    "transitionInEvent": {
-      "__id__": 7
-    },
-    "enteredEvent": {
-      "__id__": 8
-    },
-    "transitionOutEvent": {
-      "__id__": 9
-    },
-    "exitedEvent": {
-      "__id__": 10
-    },
-    "poseGraph": {
-      "__id__": 11
-    }
-  },
-  {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
-    "__type__": "cc.animation.PoseGraph",
-    "__editorExtras__": {
-      "rootOutputNodeEditorData": {
-        "centerX": 287,
-        "centerY": 63
-      }
-    },
-    "_main": {
-      "__id__": 12
-    },
-    "_shells": [
-      {
-        "__id__": 16
-      },
-      {
-        "__id__": 19
-      },
-      {
-        "__id__": 12
-      }
-    ]
-  },
-  {
-    "__type__": "cc.animation.PoseGraphNodeShell",
-    "__editorExtras__": {
-      "centerX": -9,
-      "centerY": -165
-    },
-    "_node": {
-      "__id__": 13
-    },
-    "_bindings": []
-  },
-  {
-    "__type__": "cc.animation.MotionNode",
-    "__editorExtras__": null,
-    "motion": {
-      "__id__": 14
-    },
-    "coordination": {
-      "__id__": 15
-    }
-  },
-  {
-    "__type__": "cc.animation.ClipMotion",
-    "__editorExtras__": null,
-    "clip": {
-      "__uuid__": "deaaefc9-35ed-401f-bf40-7008ac00f8f6@4c996",
-      "__expectedType__": "cc.AnimationClip"
-    }
-  },
-  {
-    "__type__": "cc.animation.MotionCoordination",
-    "group": ""
-  },
-  {
-    "__type__": "cc.animation.PoseGraphNodeShell",
-    "__editorExtras__": {
-      "centerX": -207,
-      "centerY": -35
-    },
-    "_node": {
-      "__id__": 17
-    },
-    "_bindings": []
-  },
-  {
-    "__type__": "cc.animation.SampleMotionNode",
-    "__editorExtras__": null,
-    "motion": {
-      "__id__": 18
-    },
-    "time": 0,
-    "useNormalizedTime": false
-  },
-  {
-    "__type__": "cc.animation.ClipMotion",
-    "__editorExtras__": null,
-    "clip": {
-      "__uuid__": "deaaefc9-35ed-401f-bf40-7008ac00f8f6@4c996",
-      "__expectedType__": "cc.AnimationClip"
-    }
-  },
-  {
-    "__type__": "cc.animation.PoseGraphNodeShell",
-    "__editorExtras__": {
-      "centerX": -136,
-      "centerY": 215
-    },
-    "_node": {
-      "__id__": 20
-    },
-    "_bindings": []
-  },
-  {
-    "__type__": "cc.animation.ApplyTransform",
-    "__editorExtras__": null,
-    "input": null,
-    "transformName": "pelvis",
-    "positionApplyFlag": 0,
-    "position": {
-      "__type__": "cc.Vec3",
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "rotationApplyFlag": 0,
-    "rotation": {
-      "__type__": "cc.Quat",
-      "x": 0,
-      "y": 0,
-      "z": 0,
-      "w": 1
-    },
-    "intensity": {
-      "__id__": 21
-    },
-    "transformSpaceRequirement": 0
-  },
-  {
-    "__type__": "cc.animation.IntensitySpecification",
-    "type": 0,
-    "value": 1,
-    "auxiliaryCurveName": ""
-  },
-  {
     "__type__": "cc.animation.Motion",
     "__editorExtras__": {
       "name": "",
-      "id": "16813019206160.007585815666226514",
+      "id": "16813922088710.8621463822226816",
       "clone": null,
-      "centerX": -184,
-      "centerY": -174
+      "centerX": -66,
+      "centerY": -106.5
     },
     "name": "ALS_N_Sprint_F_Impulse",
-    "transitionInEvent": {
-      "__id__": 23
-    },
-    "enteredEvent": {
-      "__id__": 24
-    },
-    "transitionOutEvent": {
-      "__id__": 25
-    },
-    "exitedEvent": {
-      "__id__": 26
-    },
     "_components": [],
     "motion": {
-      "__id__": 27
+      "__id__": 7
     },
     "speed": 1,
     "speedMultiplier": "",
     "speedMultiplierEnabled": false
   },
   {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
-    "__type__": "cc.animation.AnimationGraphEvent",
-    "eventName": ""
-  },
-  {
     "__type__": "cc.animation.ClipMotion",
     "__editorExtras__": {
       "name": "",
-      "id": "16813019206210.05847487096335913",
+      "id": "16813922088760.9946357053709705",
       "clone": null
     },
     "clip": {
